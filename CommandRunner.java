@@ -9,27 +9,8 @@ import java.nio.file.FileSystemAlreadyExistsException;
 import java.util.LinkedList;
 
 /**
- * Copyright 2016 Kunal Sheth
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Created by the-magical-llamicorn on 7/28/16.
  */
- 
- /*
-  * This code is meant to manage constructing Java source code from KJSH
-  * user input, storing that code, compiling it, loading it, and calling
-  * it's run() method
-  */
- 
 public class CommandRunner {
 
     private static final LinkedList<String[]> previousKjshCommands = new LinkedList<>();
@@ -91,11 +72,15 @@ public class CommandRunner {
         previousKjshCommands.push(new String[]{imports, classAndParentClassNames[1], classAndParentClassNames[0], lines, classComponents});
 
         String sourceCode = buildSourceFromKJSHInput(imports, classAndParentClassNames[1], classAndParentClassNames[0], lines, classComponents);
+
+        File file = null;
         try {
-            writeSourceToFile(classAndParentClassNames[1], sourceCode);
+            file = writeSourceToFile(classAndParentClassNames[1], sourceCode);
             ((Runnable) compileAndLoadSourceCode(classAndParentClassNames[1]).newInstance()).run();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IOException | InterruptedException e) {
             e.printStackTrace();
+
+            if (file != null) file.delete();
             classId--;
         }
     }
@@ -104,13 +89,14 @@ public class CommandRunner {
         return new String[]{(classId == -1 ? "Object" : CLASS_NAME_PREFIX + classId), CLASS_NAME_PREFIX + ++classId};
     }
 
-    private static void writeSourceToFile(String className, String sourceCode) throws IOException {
+    private static File writeSourceToFile(String className, String sourceCode) throws IOException {
         File file = new File(SOURCE_DIRECTORY.getAbsolutePath() + File.separator + className + ".java");
         if (file.exists() && !file.delete()) throw new FileSystemAlreadyExistsException(file.getAbsolutePath());
         OutputStream outputStream = new FileOutputStream(file);
         outputStream.write(sourceCode.getBytes());
         outputStream.flush();
         outputStream.close();
+        return file;
     }
 
     private static Class<?> compileAndLoadSourceCode(String className) throws ClassNotFoundException, IOException, InterruptedException {
