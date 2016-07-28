@@ -46,7 +46,7 @@ public class CommandRunner {
         String[] args = Main.getArgs();
 
         File customSourceDirectory = null;
-        int resumeClassId = -1;
+        int resumeClassId = 0;
         if (args.length == 2 && args[0] != null && args[0].equalsIgnoreCase("--srcDir")) {
             customSourceDirectory = new File(args[1]);
             if (!customSourceDirectory.exists() && !customSourceDirectory.mkdirs())
