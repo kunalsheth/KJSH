@@ -11,11 +11,8 @@ I chose to bring the idea of "write once, run anywhere" to the terminal by using
 (Please Note: the code is still in alpha, so the compiling system may not work in Windows. My apologies!)
 
 The Next Step(s)
-
 Support for ANSI escape sequences by reading dirrectly from "System.in" instead of a BufferedReader
 Support for basic auto-complete (possibly using an external library if neccessary, preferably not)
-
-
 
 
 
