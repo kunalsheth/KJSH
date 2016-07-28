@@ -55,7 +55,7 @@ public class CommandRunner {
 
             if (list != null) {
                 resumeClassId = list.length - 1;
-                Main.setPersist(false);
+                Main.setPersist(true);
             } else resumeClassId = classId;
         }
 
