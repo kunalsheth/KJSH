@@ -172,5 +172,3 @@ public class Main {
         return occurrences;
     }
 }
-
-// Copyright 2016 Kunal Sheth
