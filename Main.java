@@ -1,4 +1,3 @@
-package com.the_magical_llamicorn;
 
 import javax.swing.*;
 import java.io.BufferedReader;
