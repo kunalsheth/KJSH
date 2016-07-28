@@ -1,5 +1,5 @@
+package com.the_magical_llamicorn;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +21,8 @@ import java.io.InputStreamReader;
  */
 
 /*
- * This code is meant to manage user I/O
+ * This code is meant to treat Java in such a way, as to replace BASH and other linux shells
+ * I recommend that you read my source code in order to learn how to use this shell
  */
 
 public class Main {
@@ -65,7 +66,7 @@ public class Main {
         while (true) {
             StringBuilder header = new StringBuilder();
             header.append("\n");
-            header.append(CommandRunner.getClassId()+1);
+            header.append(CommandRunner.getClassId() + 1);
             header.append(" (");
             header.append(waitUntilDone ? "wait" : "nowait");
             header.append("|");
@@ -155,5 +156,3 @@ public class Main {
         Main.persist = persist;
     }
 }
-
-// Copyright 2016 Kunal Sheth
