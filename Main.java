@@ -1,5 +1,6 @@
 package com.the_magical_llamicorn;
 
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -36,7 +37,7 @@ public class Main {
     private static final int CLASS = 1;
     private static final int IMPORTS = 2;
     private static final String CLASS_NAME = "KJSH_command_";
-    private static final String[] CLASS_TEMPLATE = new String[]{"\n/** This file's copyright is held by the user that created it */\n/* This code was generate by KJSH */\npublic class ", " extends ", " implements Runnable {public void run(){try{\n", "\n}catch(Throwable t){t.printStackTrace();}}\n", "\n}"};
+    private static final String[] CLASS_TEMPLATE = new String[]{"\n/** This file's copyright is held by the user that created it */\n/* This code was generate by KJSH */\n\npublic class ", " extends ", " implements Runnable {public void run(){try{\n", "\n}catch(Throwable t){t.printStackTrace();}}\n", "\n}"};
     private static final String ROOT_CLASS;
     private static final ProcessBuilder COMPILER_PROCESS_BUILDER = new ProcessBuilder().inheritIO();
 
@@ -72,16 +73,12 @@ public class Main {
 
         if (!srcDir.exists() && !srcDir.mkdirs())
             throw new ExceptionInInitializerError(new IOException("!srcDir.exists() && !srcDir.mkdirs()"));
-        else {
-            String[] list = srcDir.list((dir, name) -> name.endsWith(".java"));
-            classId = (list == null ? 0 : list.length);
-        }
 
-        Thread rootClassThread = createCommandThread(CLASS_NAME + 0, ROOT_CLASS);
-        rootClassThread.start();
-        while (!rootClassThread.getState().equals(Thread.State.TERMINATED)) {
-            Thread.sleep(1);
-        }
+        String[] list = srcDir.list((dir, name) -> name.endsWith(".java"));
+        classId = (list == null ? 0 : list.length);
+
+        if (classId == 0) classId = 1;
+        runCode(CLASS_NAME + 0, ROOT_CLASS);
 
         while (true) {
             System.out.print(LINE_HEADER);
@@ -104,26 +101,27 @@ public class Main {
                 tabs += occurrencesOfChar('{', classComponents);
                 tabs -= occurrencesOfChar('}', classComponents);
 
-                if (!waitUntilDone) annotation = "done";
+                if (!waitUntilDone) annotation = "Run";
                 else continue;
             }
 
-            if (annotation.equalsIgnoreCase("done")) {
-                String source = buildSource(imports, CLASS_NAME + ++classId, CLASS_NAME + (classId - 1), lines, classComponents);
+            if (annotation.equalsIgnoreCase("Run")) {
+                runCode(CLASS_NAME + classId, buildSource(imports, CLASS_NAME + classId, CLASS_NAME + (classId - 1), lines, classComponents));
+
                 lines = "";
                 classComponents = "";
-                Thread command = createCommandThread(CLASS_NAME + classId, source);
-                command.start();
-            } else if (annotation.equalsIgnoreCase("nowait")) waitUntilDone = false;
-            else if (annotation.equalsIgnoreCase("wait")) waitUntilDone = true;
+                classId++;
+            } else if (annotation.equalsIgnoreCase("NoWait")) waitUntilDone = false;
+            else if (annotation.equalsIgnoreCase("Wait")) waitUntilDone = true;
 
-            else if (annotation.equalsIgnoreCase("import")) addToLocation = IMPORTS;
-            else if (annotation.equalsIgnoreCase("class")) addToLocation = CLASS;
-            else if (annotation.equalsIgnoreCase("lines")) addToLocation = LINES;
+            else if (annotation.equalsIgnoreCase("Imports")) addToLocation = IMPORTS;
+            else if (annotation.equalsIgnoreCase("Class")) addToLocation = CLASS;
+            else if (annotation.equalsIgnoreCase("Lines")) addToLocation = LINES;
+            else { System.out.println("@What?"); }
         }
     }
 
-    private static Thread createCommandThread(String className, String javaSource) throws IOException {
+    private static void runCode(String className, String javaSource) throws IOException {
         File file = new File(srcDir.getAbsolutePath() + File.separator + className + ".java");
         if (file.exists() && !file.delete()) throw new FileSystemAlreadyExistsException(file.getAbsolutePath());
 
@@ -133,18 +131,9 @@ public class Main {
         outputStream.close();
 
         try {
-            Thread thread = new Thread((Runnable) compile(className, srcDir).newInstance());
-            thread.setName(className + " Executor");
-            thread.setPriority(Thread.MAX_PRIORITY);
-            thread.start();
-            return thread;
+            ((Runnable) compile(className, srcDir).newInstance()).run();
         } catch (Throwable t) {
             classId--;
-            return new Thread(new Runnable() {
-                public void run() {
-                    t.printStackTrace();
-                }
-            });
         }
     }
 
