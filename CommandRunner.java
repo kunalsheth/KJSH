@@ -24,6 +24,13 @@ import java.util.LinkedList;
  * limitations under the License.
  */
  
+ /*
+  * This code is meant to manage generating Java source code from user
+  * input, storing the source code files, compiling the code, loading the
+  * classes described by the source code, and calling the run() method
+  * of the loaded KJSH command class
+  */
+ 
 public class CommandRunner {
 
     private static final LinkedList<String[]> previousKjshCommands = new LinkedList<>();
