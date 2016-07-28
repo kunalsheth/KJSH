@@ -25,7 +25,7 @@ import java.util.LinkedList;
  */
  
  /*
-  * This code is mean to manage constructing Java source code from KJSH
+  * This code is meant to manage constructing Java source code from KJSH
   * user input, storing that code, compiling it, loading it, and calling
   * it's run() method
   */
