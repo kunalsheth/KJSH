@@ -1,9 +1,9 @@
+package com.the_magical_llamicorn;
 
-import java.awt.*;
-import java.io.*;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.FileSystemAlreadyExistsException;
+import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Copyright 2016 Kunal Sheth
@@ -28,60 +28,62 @@ import java.nio.file.FileSystemAlreadyExistsException;
 
 public class Main {
 
-    private static final String LINE_HEADER = "\nkjsh$ ";
+    private static final String LINE_HEADER = "kjsh$";
 
     private static final BufferedReader BUFFERED_READER = new BufferedReader(new InputStreamReader(System.in));
+    private static final int ADD_TO_LINES = 0;
+    private static final int ADD_TO_CLASS = 1;
+    private static final int ADD_TO_IMPORTS = 2;
 
-    private static final int LINES = 0;
-    private static final int CLASS = 1;
-    private static final int IMPORTS = 2;
-    private static final String CLASS_NAME = "KJSH_command_";
-    private static final String[] CLASS_TEMPLATE = new String[]{"\n/** This file's copyright is held by the user that created it */\n/* This code was generate by KJSH */\n\npublic class ", " extends ", " implements Runnable {public void run(){try{\n", "\n}catch(Throwable t){t.printStackTrace();}}\n", "\n}"};
-    private static final String ROOT_CLASS;
-    private static final ProcessBuilder COMPILER_PROCESS_BUILDER = new ProcessBuilder().inheritIO();
-
-    private static File srcDir = new File("/tmp/kjsh_" + System.currentTimeMillis() + "/");
-    private static int addToLocation = 0;
+    private static String[] args;
+    private static int addToBuffer = 0;
     private static String imports = "";
     private static String lines = "";
     private static String classComponents = "";
-    private static int tabs = 0;
-    private static int classId = 0;
     private static boolean waitUntilDone = false;
 
-    static {
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("KJSH_root_command.src")));
-            StringBuilder fileData = new StringBuilder();
-            String ln;
-            while ((ln = bufferedReader.readLine()) != null) {
-                fileData.append(ln);
-                fileData.append('\n');
-            }
-            ROOT_CLASS = fileData.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    private static boolean persist = false;
 
     public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (args.length == 2 && args[0] != null && args[0].equalsIgnoreCase("--srcDir")) {
-            srcDir = new File(args[1]);
-        }
+        Main.args = args;
 
-        if (!srcDir.exists() && !srcDir.mkdirs())
-            throw new ExceptionInInitializerError(new IOException("!srcDir.exists() && !srcDir.mkdirs()"));
+        CommandRunner.start();
 
-        String[] list = srcDir.list((dir, name) -> name.endsWith(".java"));
-        classId = (list == null ? 0 : list.length);
-
-        if (classId == 0) classId = 1;
-        runCode(CLASS_NAME + 0, ROOT_CLASS);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                System.out.println(persist ? "Source directory saved at " + CommandRunner.getSourceDirectory() : "Deleting source directory");
+                if (!persist) {
+                    ProcessBuilder processBuilder = new ProcessBuilder().inheritIO();
+                    processBuilder.command("rm", "-r", CommandRunner.getSourceDirectory().getAbsolutePath());
+                    try {
+                        processBuilder.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
         while (true) {
-            System.out.print(LINE_HEADER);
-            for (int i = 0; i < tabs; i++) System.out.print('\t');
+            StringBuilder header = new StringBuilder();
+            header.append("\n");
+            header.append(CommandRunner.getClassId());
+            header.append(" (");
+            header.append(waitUntilDone ? "wait" : "nowait");
+            header.append("|");
+            if (addToBuffer == ADD_TO_IMPORTS) header.append("imports");
+            else if (addToBuffer == ADD_TO_LINES) header.append("lines");
+            else if (addToBuffer == ADD_TO_CLASS) header.append("class");
+            header.append(") ");
+            header.append(LINE_HEADER);
+            header.append(' ');
+            int tabs = 0;
+            tabs += occurrencesOfChar('{', lines);
+            tabs -= occurrencesOfChar('}', lines);
+            tabs += occurrencesOfChar('{', classComponents);
+            tabs -= occurrencesOfChar('}', classComponents);
+            for (int i = 0; i < tabs; i++) header.append('\t');
+            System.out.print(header);
 
             String ln = BUFFERED_READER.readLine();
             if (ln == null) System.exit(0);
@@ -90,75 +92,46 @@ public class Main {
             String annotation = parseAnnotation(ln);
 
             if (annotation == null) {
-                if (addToLocation == IMPORTS) imports += ln + '\n';
-                else if (addToLocation == LINES) lines += ln + '\n';
-                else if (addToLocation == CLASS) classComponents += ln + '\n';
-
-                tabs = 0;
-                tabs += occurrencesOfChar('{', lines);
-                tabs -= occurrencesOfChar('}', lines);
-                tabs += occurrencesOfChar('{', classComponents);
-                tabs -= occurrencesOfChar('}', classComponents);
+                if (addToBuffer == ADD_TO_IMPORTS) imports += ln + '\n';
+                else if (addToBuffer == ADD_TO_LINES) lines += ln + '\n';
+                else if (addToBuffer == ADD_TO_CLASS) classComponents += ln + '\n';
 
                 if (!waitUntilDone) annotation = "Run";
                 else continue;
             }
 
             if (annotation.equalsIgnoreCase("Run")) {
-                runCode(CLASS_NAME + classId, buildSource(imports, CLASS_NAME + classId, CLASS_NAME + (classId - 1), lines, classComponents));
-
+                CommandRunner.runKjshInput(imports, lines, classComponents);
                 lines = "";
                 classComponents = "";
-                classId++;
-            } else if (annotation.equalsIgnoreCase("NoWait")) waitUntilDone = false;
-            else if (annotation.equalsIgnoreCase("Wait")) waitUntilDone = true;
+            } else if (annotation.equalsIgnoreCase("Wait")) waitUntilDone = true;
+            else if (annotation.equalsIgnoreCase("NoWait")) waitUntilDone = false;
 
-            else if (annotation.equalsIgnoreCase("Imports")) addToLocation = IMPORTS;
-            else if (annotation.equalsIgnoreCase("Class")) addToLocation = CLASS;
-            else if (annotation.equalsIgnoreCase("Lines")) addToLocation = LINES;
-            else { System.out.println("@What?"); }
+            else if (annotation.equalsIgnoreCase("Imports")) addToBuffer = ADD_TO_IMPORTS;
+            else if (annotation.equalsIgnoreCase("Class")) addToBuffer = ADD_TO_CLASS;
+            else if (annotation.equalsIgnoreCase("Lines")) addToBuffer = ADD_TO_LINES;
+
+            else if (annotation.equalsIgnoreCase("Imports?")) System.out.println(imports);
+            else if (annotation.equalsIgnoreCase("Lines?")) System.out.println(lines);
+            else if (annotation.equalsIgnoreCase("Class?")) System.out.println(classComponents);
+
+            else if (annotation.equalsIgnoreCase("ClearImports")) imports = "";
+            else if (annotation.equalsIgnoreCase("ClearLines")) lines = "";
+            else if (annotation.equalsIgnoreCase("ClearClass")) classComponents = "";
+
+            else if (annotation.equalsIgnoreCase("NoPersist")) persist = false;
+            else if (annotation.equalsIgnoreCase("Persist")) persist = true;
+            else if (annotation.equalsIgnoreCase("Persist?")) System.out.println(persist);
+
+            else if (annotation.equalsIgnoreCase("ResetSrcDir")) {
+                CommandRunner.reset();
+                lines = "";
+                classComponents = "";
+                imports = "";
+            } else {
+                System.out.println("@What?");
+            }
         }
-    }
-
-    private static void runCode(String className, String javaSource) throws IOException {
-        File file = new File(srcDir.getAbsolutePath() + File.separator + className + ".java");
-        if (file.exists() && !file.delete()) throw new FileSystemAlreadyExistsException(file.getAbsolutePath());
-
-        OutputStream outputStream = new FileOutputStream(file);
-        outputStream.write(javaSource.getBytes());
-        outputStream.flush();
-        outputStream.close();
-
-        try {
-            ((Runnable) compile(className, srcDir).newInstance()).run();
-        } catch (Throwable t) {
-            classId--;
-        }
-    }
-
-    private static Class<?> compile(String className, File sourceDir) throws ClassNotFoundException, IOException, InterruptedException {
-        if (className == null || sourceDir == null) return null;
-
-        File[] files = sourceDir.listFiles(pathname -> pathname.getAbsolutePath().endsWith(".java"));
-
-        if (files == null) return null;
-
-        String[] command = new String[files.length + 1];
-        command[0] = "javac";
-        for (int i = 0; i < files.length; i++) {
-            command[i + 1] = files[i].getAbsolutePath();
-        }
-
-        COMPILER_PROCESS_BUILDER.command(command);
-        Process process = COMPILER_PROCESS_BUILDER.start();
-        process.waitFor();
-
-        ClassLoader loader = new URLClassLoader(new URL[]{new File(sourceDir.getAbsolutePath()).toURI().toURL()});
-        return loader.loadClass(className);
-    }
-
-    private static String buildSource(String imports, String className, String parentClass, String lines, String classComponents) {
-        return imports + CLASS_TEMPLATE[0] + className + CLASS_TEMPLATE[1] + parentClass + CLASS_TEMPLATE[2] + lines + CLASS_TEMPLATE[3] + classComponents + CLASS_TEMPLATE[4];
     }
 
     private static String parseAnnotation(String line) {
@@ -171,4 +144,18 @@ public class Main {
         for (int i = 0; i < text.length(); i++) if (text.charAt(i) == character) occurrences++;
         return occurrences;
     }
+
+    protected static String[] getArgs() {
+        return args.clone();
+    }
+
+    public static boolean isPersist() {
+        return persist;
+    }
+
+    public static void setPersist(boolean persist) {
+        Main.persist = persist;
+    }
 }
+
+// Copyright 2016 Kunal Sheth

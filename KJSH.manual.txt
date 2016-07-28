@@ -1,0 +1,67 @@
+HOW TO USE KJSH:
+
+Arguments:
+
+—-SrcDir [source directory path]
+
+
+
+You can control the behavior of the shell by using these annotations between lines of Java code:
+
+@Run
+	Instantly compiles and runs all the data stored in the buffers
+	Calls a @ClearLines and @ClearClass
+	The Imports buffer is not clear and is reused
+
+@Wait
+	Useful for writing multiline statements and blocks
+
+@NoWait
+	Enabled by Default
+	Calls a @Run every time the user hits Enter after typing Java code
+	Makes it impossible to write multiline statements or blocks	
+
+@Imports
+	Directs the input to the Imports buffer
+
+@Lines
+	Enabled by Default
+	Directs the input to the Lines buffer
+
+@Class
+	Directs the input to the Class buffer
+
+@Imports?
+	Prints the data stored in the Imports buffer
+
+@Lines?
+	Prints the data stored in the Lines buffer
+
+@Class?
+	Prints the data stored in the Class Components buffer
+
+@ClearImports
+	Clears the Imports buffer
+
+@ClearLines
+	Clears the Lines buffer
+
+@ClearClass
+	Clears the Class Components buffer
+
+@Persist
+	Saves source directory after shutdown
+	Session can be resumed if —-SrcDir is set the current source directory path
+
+@Persist?
+	Prints the whether or not the source directory will be saved
+
+@NoPersist
+	Enabled by Default
+	Deletes the source directory after shutdown
+
+@ResetSrcDir
+	Deletes all the files stored in the source directory
+	Calls a @ClearImports, @ClearLines, and @ClearClass
+	Starts from the root class
+	Useful for removing all inherited methods and fields
