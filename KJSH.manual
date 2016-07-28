@@ -6,6 +6,20 @@ Arguments:
 
 
 
+KJSH has some utility methods:
+
+String KJSH.getVersion()
+	Returns a String containing KJSH version information
+
+void KJSH.clear()
+	Prints 100 blank lines to clear the terminal screen
+	
+int KJSH.runInShell(String)
+	Executes the given sh code with a ProcessBuilder
+	Returns the processes exit code
+
+
+
 You can control the behavior of the shell by using these annotations between lines of Java code:
 
 @Run
