@@ -1,5 +1,5 @@
 # KJSH
-Kunal's Java SHell
+Kunal's Java Shell
 
 This program is intended to replace normal Linux shells (like bash) because I find the syntax to be unwieldy and difficult to use.
 KJSH is mainly for people in the same position I was in a few years ago.
