@@ -1,14 +1,14 @@
 # KJSH
 Kunal's Java SHell
 
-This program is intended to replace normal Linux shells (like bash) because they are very ugly and the syntax is difficult to use. (in my opinion)
+This program is intended to replace normal Linux shells (like bash) because I find the syntax to be unwieldy and difficult to use (in my opinion).
 KJSH is mainly for people in the same possition I was a few years ago.
 I wanted to get started with Linux but learning my way around bash was a huge learning curve.
-I wished there was another way I could interact directly with the operating system in a language and style that I was more accustom too.
+I wished there was another way I could interact directly with the operating system in a language and style that is more intuitive.
 
-I chose to bring the idea of "write once, run anywhere" to the terminal by using Java to interact with the OS in a command-line like fassion.
+I chose to bring the idea of "write once, run anywhere" to the terminal by using Java to interact with the OS in a command line-like fashion.
 
-(Please Note: the code is still in alpha, the compiling system may not work in Windows. Sorry.)
+(Please Note: the code is still in alpha, so the compiling system may not work in Windows. My apologies!)
 
 
 
