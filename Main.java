@@ -21,8 +21,8 @@ import java.io.InputStreamReader;
  */
 
 /*
- * This code is meant to treat Java in such a way, as to replace BASH and other linux shells
- * I recommend that you read my source code in order to learn how to use this shell
+ * This code is meant to manage user I/O and forward that data to the
+ * CommandRunner class
  */
 
 public class Main {
