@@ -1,4 +1,3 @@
-package com.the_magical_llamicorn;
 
 import java.io.File;
 import java.io.FileOutputStream;
