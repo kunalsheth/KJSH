@@ -65,7 +65,7 @@ public class Main {
         while (true) {
             StringBuilder header = new StringBuilder();
             header.append("\n");
-            header.append(CommandRunner.getClassId());
+            header.append(CommandRunner.getClassId()+1);
             header.append(" (");
             header.append(waitUntilDone ? "wait" : "nowait");
             header.append("|");
