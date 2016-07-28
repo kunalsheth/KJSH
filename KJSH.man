@@ -5,7 +5,7 @@ Arguments:
 
 
 
-You can control the behavior of the shell by using these annotations:
+You can control the behavior of the shell by using these annotations with you commands:
 
 @Run
 	Instantly compiles and runs all the data stored in the Imports, Lines, and Class Components Buffers
