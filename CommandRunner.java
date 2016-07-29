@@ -23,21 +23,22 @@ import java.util.LinkedList;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
  /*
   * This code is meant to manage generating Java source code from user
   * input, storing the source code files, compiling the code, loading the
   * classes described by the source code, and calling the run() method
   * of the loaded KJSH command class
   */
- 
+
 public class CommandRunner {
 
     private static final LinkedList<String[]> previousKjshCommands = new LinkedList<>();
 
     private static final String CLASS_NAME_PREFIX = "KJSH_command_";
     private static final String[] CLASS_TEMPLATE = new String[]{"\n/** This file's copyright is held by the user that created it */\n/* This code was generate by KJSH */\n\npublic class ", " extends ", " implements Runnable {public void run(){try{\n", "\n}catch(Throwable t){t.printStackTrace();}}\n", "\n}"};
-    private static final String[] ROOT_CLASS_IMPORTS_LINES_CLASS_COMPONENTS = new String[]{"import java.io.IOException;", "System.out.println(\"Welcome to Kunal's Java Shell (KJSH)\\nVersion: \"+KJSH.VERSION);", "public void help(){System.out.println(\"I'm too lazy to type out a man page... Just read the source, its only a few pages long.\\nhttp://github.com/the-magical-llamicorn/KJSH\");}public static class KJSH{public static final String VERSION=\"0.9 alpha\";public static void clear(){for(int i=0;i<100;i++)System.out.println();}public static int runInShell(String command)throws IOException,InterruptedException{if(command==null||(command=command.trim()).equals(\"\"))return 0;if(command.contains(\";\")){int exitCode=0,returnCode=0;String[] subCommands=command.split(\";\");for(int i=0;i<subCommands.length;i++)if((exitCode=runInShell(subCommands[i]))<returnCode)returnCode=exitCode;return returnCode;}ProcessBuilder processBuilder=new ProcessBuilder().inheritIO();processBuilder.command(command.split(\" \"));return processBuilder.start().waitFor();}}"};
+    private static final String[] ROOT_CLASS_IMPORTS_LINES_CLASS_COMPONENTS = new String[]{"import java.io.IOException;", "System.out.println(\"Welcome to Kunal's Java SHell (KJSH)\\nVersion: \" + KJSH.getVersion());", "public void help() {System.out.println(\"I'm too lazy to type out a man page. Sorry.\");}public static class KJSH{public static final String VERSION=\"0.9 alpha\";public static void clear(){for(int i=0;i<100;i++)System.out.println();}public static class KJSH {public static final String VERSION = \"1.2 alpha\";public static String getVersion() {return VERSION;}public static void clear() {for (int i = 0; i < 100; i++) System.out.println();}public static int runInShell(String command) throws IOException, InterruptedException {if (command == null || (command = command.trim()).equals(\"\")) return 0;if (command.contains(\";\")) {int exitCode = 0, returnCode = 0;String[] subCommands = command.split(\";\");for (int i = 0; i < subCommands.length; i++) if ((exitCode = runInShell(subCommands[i])) < returnCode) returnCode = exitCode;return returnCode;}ProcessBuilder processBuilder = new ProcessBuilder().inheritIO();processBuilder.command(command.split(\" \"));return processBuilder.start().waitFor();}}"};
+
     private static final ProcessBuilder COMPILER_PROCESS_BUILDER = new ProcessBuilder().inheritIO();
     private static final File SOURCE_DIRECTORY;
 
