@@ -16,7 +16,7 @@ void KJSH.clear()
 	
 int KJSH.runInShell(String)
 	Executes the given sh code with a ProcessBuilder
-	Returns the processes exit code
+	Returns the process's exit code
 
 
 
@@ -28,7 +28,7 @@ You can control the behavior of the shell by using these annotations between lin
 	The Imports buffer is not clear and is reused
 
 @Wait
-	Useful for writing multiline statements and blocks
+	Useful for writing multi line statements and blocks
 
 @NoWait
 	Enabled by Default
@@ -79,3 +79,5 @@ You can control the behavior of the shell by using these annotations between lin
 	Calls a @ClearImports, @ClearLines, and @ClearClass
 	Starts from the root class
 	Useful for removing all inherited methods and fields
+
+
