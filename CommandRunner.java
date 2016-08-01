@@ -1,3 +1,4 @@
+package com.the_magical_llamicorn;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,7 +62,7 @@ public class CommandRunner {
             } else resumeClassId = classId;
         }
 
-        SOURCE_DIRECTORY = customSourceDirectory == null ? new File("/tmp/kjsh_" + System.currentTimeMillis() + "/") : customSourceDirectory;
+        SOURCE_DIRECTORY = customSourceDirectory == null ? new File(System.getProperty("java.io.tmpdir")+File.separator+"kjsh_" + System.currentTimeMillis()) : customSourceDirectory;
         if (!SOURCE_DIRECTORY.exists() && !SOURCE_DIRECTORY.mkdirs())
             throw new ExceptionInInitializerError(new IOException("(!SOURCE_DIRECTORY.exists() && !SOURCE_DIRECTORY.mkdirs()) is true"));
 
