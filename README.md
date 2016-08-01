@@ -8,7 +8,7 @@ I wished there was another way I could interact directly with the operating syst
 
 I chose to bring the idea of "write once, run anywhere" to the terminal by using Java to interact with the OS in a command line-like fashion.
 
-(Please Note: the code is still in alpha, so the CommandRunner class may not work in Windows. My apologies!)
+(Please Note: This program has not been extensively tested on Winodows yet)
 
 The Next Step(s):
 Support for ANSI escape sequences by reading dirrectly from "System.in" instead of a BufferedReader
