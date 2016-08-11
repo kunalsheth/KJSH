@@ -8,11 +8,11 @@ I wished there was another way I could interact with the operating system in a l
 
 I chose to bring the idea of "write once, run anywhere" to the terminal by using Java to interact with the OS in a command line-like fashion.
 
-(Please Note: This program has not been extensively tested with Winodows yet)
+(Please Note: This program has not been extensively tested with Windows yet)
 
 The Next Step(s):
-Support for ANSI escape sequences by reading dirrectly from "System.in" instead of a BufferedReader
-Support for basic auto-complete (possibly using an external library, if neccessary)
+Support for ANSI escape sequences by reading directly from "System.in" instead of a BufferedReader
+Support for basic auto-complete (possibly using an external library, if necessary)
 
 
 
