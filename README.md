@@ -2,11 +2,6 @@
 Kunal's Java Shell
 
 This program is intended to replace normal shells (like Linux BASH and Windows Command Prompt) because I find the syntax to be unwieldy and difficult to use.
-KJSH is mainly for people in the same position I was in a few years ago.
-I wanted to get started with Linux, but bash was a huge learning curve.
-I wished there was another way I could interact with the operating system in a language and style that was more intuitive.
-
-I chose to bring the idea of "write once, run anywhere" to the terminal by using Java to interact with the OS in a command line-like fashion.
 
 (Please Note: This program has not been extensively tested with Windows yet)
 
